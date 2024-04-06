@@ -7,8 +7,10 @@ const mongoose = require("mongoose");
 
 const Restaurants = require('./model/Restaurants');
 
-
 const app = express();
+
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({extended: true}));
 
 const PORT = process.env.PORT || 4000;
 const DBURI = process.env.MONGO_URI;
@@ -26,6 +28,27 @@ app.get('/', (req, res) => {
     Restaurants.findOne()
         .then((result) => res.send(result))
         .catch((err) => console.log(err));
+})
+
+app.get('/getRestaurants', (req, res) => {
+    res.render('getRestaurants', {title: 'Restaurants', data: null});
+})
+
+// app.get('/getRestaurants/:id', (req, res) => {
+//     let id = req.params.id;
+
+//     Restaurants.findById(id)
+//         .then((result) => res.send(result))
+//         .catch((err) => console.log(err));
+// })
+
+app.post('/getRestaurants', (req, res) => {
+    const {id} = req.body;
+
+    Restaurants.findById(id)
+        .then((result) => res.render('getRestaurants', {title: 'Restaurants', data: result}))
+        .catch((err) => console.log(err));
+
 })
 
 app.use('', (req, res) => {
