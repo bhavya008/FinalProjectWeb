@@ -5,7 +5,7 @@ const ejs = require("ejs");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
-const Restaurants = require('./model/Restaurants');
+const db = require('./controller/db');
 
 const app = express();
 
@@ -24,32 +24,24 @@ mongoose.connect(DBURI)
     })
     .catch((err) => console.log(err));
 
-app.get('/getRestaurants', (req, res) => {
-    res.render('getRestaurants', {title: 'Restaurants', data: null, message: ""});
-})
+app.get('/api/restaurants/:id', async (req, res) => {
+    const {id} = req.params;
 
-app.post('/getRestaurants', (req, res) => {
-    const {id} = req.body;
-
-     // Check if the ID is empty or not a valid ObjectId
      if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         res.render('getRestaurants', { title: 'Restaurants', data: null, message: 'Invalid Restaurant ID!' });
         return;
     }
 
-    Restaurants.findById(id)
-    .then(result => res.render('getRestaurants', { title: 'Restaurants', data: result, message: '' }))
-    .catch(err => {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-    });
-})
+    try {
+      const restaurant = await db.getRestaurantById(id)      
+      res.render('getRestaurants', { title: 'Restaurants', data: restaurant, message:    '' })
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch restaurant" });
+    }
+});
 
-app.get('/addRestaurants', (req, res) => {
-    res.render('addRestaurant', {title: 'Add Restaurant', message: ""});
-})
-
-app.post('/addRestaurants', (req, res) => {
+app.post('/api/addRestaurants', async (req, res) => {
     const newData = {
         building: req.body.building,
         address: {
@@ -68,26 +60,16 @@ app.post('/addRestaurants', (req, res) => {
         }))
     };
 
-    Restaurants.create(newData)
-        .then((result) => res.render('addRestaurant', {title: "Add Restaurant", message: "Restaurant added successfully!"}))
-        .catch((err) => console.log(err));
+    try {
+        const restaurant = await db.addRestaurant(newData)      
+        res.render('addRestaurant', {title: "Add Restaurant", message: "Restaurant added successfully!"})
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to add restaurant" });
+      }
+
 })
 
-app.get('/updateResturant/:id', (req, res) => {
-    const {id} = req.params;
-
-    console.log(id);
-
-    Restaurants.findById(id)
-        .then((result) => res.render('updateRestaurant', {title: "Update", updateValue: result }))
-        .catch((err) => console.log(err));
-})
-
-app.post('/updateResturant', (req, res) => {
-    const {id} = req.body;
-
-    console.log(id);
-})
 
 app.get('/', (req, res) => {
     Restaurants.find().limit(10)

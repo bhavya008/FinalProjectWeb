@@ -4,7 +4,10 @@
 
 <div class="container mt-5">
     <% restaurants.forEach(restaurant => {  %>
-        <p><%= restaurant.name %></p>
+        <form action="/updateResturant/<%= restaurant._id %>" method="get">
+            <p><%= restaurant.name %></p>
+            <button type="submit" class="btn">UPDATE</button>
+        </form>
     <% }) %>
 </div>
 
