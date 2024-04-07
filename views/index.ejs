@@ -1,0 +1,11 @@
+<%- include('partials/header.ejs') %>
+
+<%- include('partials/navbar.ejs') %>
+
+<div class="container mt-5">
+    <% restaurants.forEach(restaurant => {  %>
+        <p><%= restaurant.name %></p>
+    <% }) %>
+</div>
+
+<%- include('partials/footer.ejs') %>

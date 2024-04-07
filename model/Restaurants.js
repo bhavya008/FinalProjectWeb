@@ -15,6 +15,7 @@ const restaurantSchema = new Schema({
     borough: String,
     cuisine: String,
     grades: [{
+        _id: false,
         date: Date,
         grade: String,
         score: Number
