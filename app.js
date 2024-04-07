@@ -84,9 +84,36 @@ app.get('/updateResturant/:id', (req, res) => {
 })
 
 app.post('/updateResturant', (req, res) => {
-    const {id} = req.body;
+    const id = req.body.id;
+    const newData = {
+        building: req.body.building,
+        address: {
+            coord: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)],
+            street: req.body.street,
+            zipcode: req.body.zipcode
+        },
+        borough: req.body.borough,
+        cuisine: req.body.cuisine,
+        name: req.body.name,
+        restaurant_id: req.body.restaurant_id,
+        grades: req.body.grades.map(grade => ({
+            date: new Date(grade.date),
+            grade: grade.grade,
+            score: parseInt(grade.score)
+        }))
+    };
 
-    console.log(id);
+    Restaurants.findByIdAndUpdate(id, newData)
+        .then((result) => res.redirect('/'))
+        .catch((err) => console.log(err));
+})
+
+app.get('/deleteResturant/:id', (req, res) => {
+    const {id} = req.params;
+
+    Restaurants.findByIdAndDelete(id)
+        .then((result) => res.redirect('/'))
+        .catch((err) => console.log(err));
 })
 
 app.get('/', (req, res) => {
