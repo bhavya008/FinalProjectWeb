@@ -13,6 +13,7 @@ const app = express();
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 const PORT = process.env.PORT || 4000;
 const DBURI = process.env.MONGO_URI;
@@ -28,7 +29,7 @@ mongoose
     .connect(DBURI)
     .then((result) => {
         app.listen(PORT, () => {
-            console.log("Server started on port: " + PORT); // if connected then only listen to PORT
+            console.log("Server started on http://localhost:" + PORT); // if connected then only listen to PORT
         });
     })
     .catch((err) => console.log(err));
@@ -242,6 +243,10 @@ app.get("/deleteResturant/:id", (req, res) => {
         .then((result) => res.redirect("/"))
         .catch((err) => console.log(err));
 });
+
+app.get("/about", (req, res) => {
+    res.render('about', {title: "About Us"})
+})
 
 app.get("/", (req, res) => {
     Restaurants.find()
