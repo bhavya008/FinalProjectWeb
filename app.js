@@ -2,8 +2,11 @@ require("dotenv").config();
 
 const express = require("express");
 const ejs = require("ejs");
-const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const session = require("express-session");
+// const MongoDbSession = require("connect-mongodb-session")(session);
+
 const { query, validationResult } = require("express-validator");
 
 const Restaurants = require("./model/Restaurants");
@@ -14,6 +17,11 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(session({
+    secret: 'test',
+    resave: false,
+    saveUninitialized: false
+}))
 
 const PORT = process.env.PORT || 4000;
 const DBURI = process.env.MONGO_URI;
@@ -40,25 +48,49 @@ app.get('/register', (req, res) => {
     res.render('register', {title: 'Register', errors: []});
 })
 
-app.post('/register', (req, res) => {
-    const {firstName, lastName, email, password} = req.body;
+app.post('/register', async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
 
-    const errors = []
+    const errors = [];
 
-    if(firstName == '' || lastName == '' || email == '' || password == ''){
+    if (firstName == '' || lastName == '' || email == '' || password == '') {
         errors.push('Empty Fields');
+    }
+
+    // console.log(email);
+    let user = await Users.findOne({ email });
+
+    if (user !== null) {
+        errors.push('User Already Exists!');
     }
 
     if (errors.length > 0) {
         res.render('register', { title: 'Register', errors });
+    } else {
+        try {
+            const hashedPassword = await bcrypt.hash(password, 12);
+
+            user = new Users({
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword
+            });
+
+            await user.save();
+            res.redirect('/login');
+        } catch (err) {
+            console.error(err);
+            res.status(500).send('Internal Server Error');
+        }
     }
-})
+});
 
 app.get('/login', (req, res) => {
     res.render('login', {title: 'Login', errors: []});
 })
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const {email, password} = req.body;
 
     const errors = []
@@ -67,9 +99,25 @@ app.post('/login', (req, res) => {
         errors.push('Empty Fields');
     }
 
+    let user = await Users.findOne({email});
+
+    if(!user) {
+        errors.push('User does not Exists!');
+        return res.redirect('/login');    
+    }
+
+    const isMatchedPassword = await bcrypt.compare(password, user.password);
+
+    if(!isMatchedPassword) {
+        errors.push('Password does not match!');
+    }
+
     if (errors.length > 0) {
         res.render('login', { title: 'Login', errors });
     }
+
+    res.redirect('/');
+
 })
 
 ////////////////////////////////////////////////////////////////
