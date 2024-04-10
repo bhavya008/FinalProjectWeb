@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const { query, validationResult } = require("express-validator");
 
 const Restaurants = require("./model/Restaurants");
+const Users = require("./model/User");
 
 const app = express();
 
@@ -31,6 +32,46 @@ mongoose
         });
     })
     .catch((err) => console.log(err));
+
+//////////////////////////////////////////////////////////////// USER
+
+app.get('/register', (req, res) => {
+    res.render('register', {title: 'Register', errors: []});
+})
+
+app.post('/register', (req, res) => {
+    const {firstName, lastName, email, password} = req.body;
+
+    const errors = []
+
+    if(firstName == '' || lastName == '' || email == '' || password == ''){
+        errors.push('Empty Fields');
+    }
+
+    if (errors.length > 0) {
+        res.render('register', { title: 'Register', errors });
+    }
+})
+
+app.get('/login', (req, res) => {
+    res.render('login', {title: 'Login', errors: []});
+})
+
+app.post('/login', (req, res) => {
+    const {email, password} = req.body;
+
+    const errors = []
+
+    if(email == '' || password == ''){
+        errors.push('Empty Fields');
+    }
+
+    if (errors.length > 0) {
+        res.render('login', { title: 'Login', errors });
+    }
+})
+
+////////////////////////////////////////////////////////////////
 
 app.get("/api/restaurants", (req, res) => {
     res.render("test", {
