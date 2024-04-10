@@ -3,8 +3,16 @@
 <%- include('partials/navbar.ejs') %>
 
 <div class="container">
+    <h3 class="mt-5">Find</h3>
+        <form action="/api/restaurants/find" method="get" class="mt-4">
+            <input type="number" name="page" placeholder="Enter Page*" required>
+            <input type="number" name="perPage" placeholder="Enter Per Page*" required> 
+            <input type="text" name="borough" placeholder="Enter Borough">
+            <button type="submit">Find</button>
+        </form>
     <h3 class="mt-5">Restaurants</h3>
     <div class="mt-4">
+        <% if(restaurants){ %>
         <% restaurants.forEach(restaurant => { %>
             <div class="card mb-3">
                 <div class="card-body">
@@ -16,8 +24,10 @@
         <% }) %>
     </div>
 
+
     <% if (restaurants.length === 0) { %>
         <h4>No restaurants found.</h4>
+    <% } %>
     <% } %>
 
     <!-- Pagination links -->
