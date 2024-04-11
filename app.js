@@ -205,15 +205,11 @@ app.post("/getRestaurants", (req, res) => {
         });
         return;
     }
-
+    
     Restaurants.findById(id)
         .then((result) => {
             if (result) {
-                res.render("getRestaurants", {
-                    title: "Restaurants",
-                    data: result,
-                    message: "",
-                });
+                res.render('findRestaurant', {title: "Resturant Info", restaurant: result});
             } else {
                 res.render("getRestaurants", {
                     title: "Restaurants",
