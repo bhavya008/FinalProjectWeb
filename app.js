@@ -32,6 +32,14 @@ const validateQueryParams = [
     query("borough").optional().isString(),
 ];
 
+const isAuth = (req, res, next) => {
+    if(req.session.isAuth) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
 // conntect with the database
 mongoose
     .connect(DBURI)
@@ -93,7 +101,7 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const {email, password} = req.body;
 
-    const errors = []
+    const errors = [];
 
     if(email == '' || password == ''){
         errors.push('Empty Fields');
@@ -101,24 +109,30 @@ app.post('/login', async (req, res) => {
 
     let user = await Users.findOne({email});
 
-    if(!user) {
-        errors.push('User does not Exists!');
-        return res.redirect('/login');    
-    }
+    if(user === null) {
+        errors.push('User does not Exist!');
+    } else {
+        const isMatchedPassword = await bcrypt.compare(password, user.password);
 
-    const isMatchedPassword = await bcrypt.compare(password, user.password);
-
-    if(!isMatchedPassword) {
-        errors.push('Password does not match!');
+        if(!isMatchedPassword) {
+            errors.push('Password does not match!');
+        }
     }
 
     if (errors.length > 0) {
         res.render('login', { title: 'Login', errors });
+    } else {
+        req.session.user = user;
+        req.session.isAuth = true;
+        res.redirect('/');
     }
+});
 
-    res.redirect('/');
+app.post('/logout', (req, res) => {
+    req.session.destroy(); 
+    res.redirect('/login');
+});
 
-})
 
 ////////////////////////////////////////////////////////////////
 
@@ -296,11 +310,12 @@ app.get("/about", (req, res) => {
     res.render('about', {title: "About Us"})
 })
 
-app.get("/", (req, res) => {
+app.get("/", isAuth ,(req, res) => {
+    const user = req.session.user;
     Restaurants.find()
         .limit(10)
         .then((result) =>
-            res.render("index", { title: "ALL", restaurants: result })
+            res.render("index", { title: "ALL", restaurants: result, user })
         )
         .catch((err) => console.log(err));
 });
