@@ -306,6 +306,14 @@ app.get("/deleteResturant/:id", (req, res) => {
         .catch((err) => console.log(err));
 });
 
+app.get("/findResturant/:id", (req, res) => {
+    const id = req.params.id;
+
+    Restaurants.findById(id)
+        .then((result) => res.render('findRestaurant', {title: "Resturant Info", restaurant: result}))
+        .catch((err) => console.log(err));
+})
+
 app.get("/about", (req, res) => {
     res.render('about', {title: "About Us"})
 })

@@ -29,7 +29,7 @@
             <th scope="row"><%= counter++ %></th>
             <td>                
                 <form action="/findResturant/<%= restaurant._id %>" method="get">
-                    <a type="submit" onmouseover="this.style.color='red';" onmouseout="this.style.color='black'"><%= restaurant.restaurant_id %></a>
+                    <button class="findButton" type="submit" onmouseover="this.style.color='red';" onmouseout="this.style.color='black'"><%= restaurant.restaurant_id %></button>
                 </form>
             </td>
             <td><%= restaurant.name %></td>
