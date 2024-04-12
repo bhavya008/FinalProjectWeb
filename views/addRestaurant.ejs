@@ -1,7 +1,7 @@
 <%- include('partials/header.ejs') %> <%- include('partials/navbar.ejs') %>
 
         <div class="container">
-            <h4 class="mt-3">Add Restaurant</h4>
+            <h3 class="mt-3 heading">Add <span>Restaurant</span></h3>
 
             <form action="/addRestaurants" method="post" class="row g-3 mt-3">
                 <div class="col-md-6">
@@ -40,26 +40,26 @@
                     <div class="grade row">
                         <div class="col-md-4">
                             <label for="grade1_date">Grade Date:</label>
-                            <input type="datetime-local" class="form-control" name="grades[][date]" required />
+                            <input type="datetime-local" class="form-control" name="grades[0][date]" required />
                         </div>
                         <div class="col-md-4">
                             <label for="grade1_date">Grade:</label>
-                            <input type="text" name="grades[][grade]" class="form-control"  required />
+                            <input type="text" name="grades[0][grade]" class="form-control" required />
                         </div>
                         <div class="col-md-4">
                             <label for="grade1_date">Score:</label>
-                            <input type="text" name="grades[][score]" class="form-control" required />
+                            <input type="text" name="grades[0][score]" class="form-control" required />
                         </div>
                     </div>
                 </div>
                 <div class="col-12">
-                <button type="button" class="btn btn-sm btn-primary mt-2" id="add-grade">Add Grade</button>
-                <button type="button" class="btn btn-sm btn-secondary mt-2" id="remove-grade">Remove Grade</button>
-            </div>
-            <div class="col-12">
-            <button type="submit" class="btn btn-lg btn-primary mt-2">Add Restaurant</button>
-        </div>
-    </form>        
+                    <button type="button" class="btn btn-sm btn-success mt-2" id="add-grade">Add Grade</button>
+                    <button type="button" class="btn btn-sm btn-danger mt-2" id="remove-grade">Remove Grade</button>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-outline-secondary mt-2">Add Restaurant</button>
+                </div>
+            </form>
 
             <div class="container mt-5">
                 <h4>
@@ -71,28 +71,30 @@
         <script>
             document.getElementById("add-grade").addEventListener("click", function () {
                 const gradesContainer = document.getElementById("grades-container");
+                const gradeCount = gradesContainer.querySelectorAll(".grade").length;
                 const newGrade = document.createElement("div");
                 newGrade.classList.add("grade");
 
                 newGrade.innerHTML = `
-                <div class="grade row">
-                        <div class="col-md-4">
-                            <label for="grade1_date">Grade Date:</label>
-                            <input type="datetime-local" class="form-control" name="grades[][date]" required />
-                        </div>
-                        <div class="col-md-4">
-                            <label for="grade1_date">Grade:</label>
-                            <input type="text" name="grades[][grade]" class="form-control"  required />
-                        </div>
-                        <div class="col-md-4">
-                            <label for="grade1_date">Score:</label>
-                            <input type="text" name="grades[][score]" class="form-control" required />
-                        </div>
-                    </div>
-        `;
+        <div class="grade row">
+            <div class="col-md-4">
+                <label for="grade${gradeCount + 1}_date">Grade Date:</label>
+                <input type="datetime-local" class="form-control" name="grades[${gradeCount}][date]" required />
+            </div>
+            <div class="col-md-4">
+                <label for="grade${gradeCount + 1}_grade">Grade:</label>
+                <input type="text" name="grades[${gradeCount}][grade]" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label for="grade${gradeCount + 1}_score">Score:</label>
+                <input type="text" name="grades[${gradeCount}][score]" class="form-control" required />
+            </div>
+        </div>
+    `;
 
                 gradesContainer.appendChild(newGrade);
             });
+
 
             document
                 .getElementById("remove-grade")

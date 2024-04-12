@@ -171,7 +171,7 @@ app.get("/api/restaurants/find", validateQueryParams, async (req, res) => {
             .limit(perPage);
 
         res.render("test", {
-            title: "t",
+            title: "Search",
             restaurants,
             page,
             perPage,
@@ -230,8 +230,8 @@ app.get("/addRestaurants", (req, res) => {
 
 app.post("/addRestaurants", (req, res) => {
     const newData = {
-        building: req.body.building,
         address: {
+            building: req.body.building,
             coord: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)],
             street: req.body.street,
             zipcode: req.body.zipcode,
@@ -240,11 +240,15 @@ app.post("/addRestaurants", (req, res) => {
         cuisine: req.body.cuisine,
         name: req.body.name,
         restaurant_id: req.body.restaurant_id,
+        // Ensure grades array is properly formatted
         grades: req.body.grades.map((grade) => ({
-            date: new Date(grade.date),
-            grade: grade.grade,
-            score: parseInt(grade.score),
-        })),
+            // Parse date string to Date object, handle invalid dates
+            date: new Date(grade.date) || null,
+            // Ensure grade is a string, handle invalid grades
+            grade: typeof grade.grade === 'string' ? grade.grade : null,
+            // Parse score to integer, handle invalid scores
+            score: parseInt(grade.score) || null,
+        })).filter(grade => grade.date && grade.grade && !isNaN(grade.score)),
     };
 
     Restaurants.create(newData)
@@ -272,8 +276,8 @@ app.get("/updateResturant/:id", (req, res) => {
 app.post("/updateResturant", (req, res) => {
     const id = req.body.id;
     const newData = {
-        building: req.body.building,
         address: {
+            building: req.body.building,
             coord: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)],
             street: req.body.street,
             zipcode: req.body.zipcode,
@@ -317,7 +321,7 @@ app.get("/about", (req, res) => {
 app.get("/", isAuth ,(req, res) => {
     const user = req.session.user;
     Restaurants.find()
-        .limit(10)
+        .limit(9)
         .then((result) =>
             res.render("index", { title: "ALL", restaurants: result, user })
         )

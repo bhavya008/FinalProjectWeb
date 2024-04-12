@@ -2,10 +2,10 @@
 
 <%- include('partials/navbar.ejs') %>
 
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="row">
         <div class="col-md-6">
-            <h3>Restaurant Details</h3>
+            <h3 class="heading"><span>Restaurant</span> Details</h3>
             <ul class="list-group">
                 <li class="list-group-item"><strong>Name:</strong> <%= restaurant.name %></li>
                 <li class="list-group-item"><strong>Restaurant ID:</strong> <%= restaurant.restaurant_id %></li>
@@ -15,7 +15,7 @@
             </ul>
         </div>
         <div class="col-md-6">
-            <h3>Address</h3>
+            <h3 class="heading"><span>Address</span></h3>
             <ul class="list-group">
                 <li class="list-group-item"><strong>Building:</strong> <%= restaurant.address.building %></li>
                 <li class="list-group-item"><strong>Street:</strong> <%= restaurant.address.street %></li>
@@ -24,7 +24,7 @@
             </ul>
         </div>
     </div>
-    <h3 class="mt-4">Grades</h3>
+    <h3 class="mt-4 heading"><span>Grades</span></h3>
     <table class="table">
         <thead>
             <tr>
